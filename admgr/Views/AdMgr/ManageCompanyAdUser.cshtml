@@ -1,0 +1,205 @@
+﻿
+@{
+    ViewBag.Title = "管理公司域用户";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div id="ManageCompanyAdUser">
+    <div class="demo-section k-content wide ">
+        <div>
+            <h2>管理公司域用户信息</h2>
+            <h4>Add or update a record</h4>
+            <div data-role="grid"
+                 data-editable="popup"
+                 data-toolbar="['create']"
+                 data-columns="[
+                    { 'field': 'Sn',title:'姓名' ,'width': 40},
+                    { 'field': 'Number',title:'工号' ,'width': 40},
+                    { 'field': 'AdName', title:'域帐号名称','width': 40 },
+                    { 'field': 'CompanyId',title:'公司' ,editor:companyDropDownEditor,template:'#:getCompanyName(CompanyId)#' ,'width': 120},
+                    { 'field': 'DeptId',title:'部门' ,editor:deptDropDownEditor,template:'#:getDeptName(DeptId)#','width': 120},
+                    { 'field': 'TitleId',title:'职务' ,editor:titleDropDownEditor,template:'#:getTitleName(TitleId)#','width': 60},
+                    @*{ 'field': 'DisplayName',title:'显示名' ,'width': 160},*@
+                    { 'field': 'Email',title:'邮箱' ,'width': 100},
+                    { 'field': 'Mobile',title:'移动电话' ,'width': 80},
+                    { 'field': 'DisbleId',editor:disbleDropDownEditor,template:'#:getDisableName(DisbleId)#',title:'启用/禁用' ,'width': 60},
+                    { 'command': ['edit','destroy'],title:'编辑' ,'width': 80}
+                         ]"
+                 data-bind="source: adUsers,
+                            visible: isVisible,
+                            @*events: {
+                              save: onSave
+                            }*@"
+                 style="height: 600px"></div>
+        </div>
+    </div>
+</div>
+    <script>
+        var CompanyArray;
+        var DeptArray;
+        var TitleArray;
+        var DisableArray = [{ "DisbleId": "1", "DisableName": "启用" }, { "DisbleId": "2", "DisableName": "禁用" }]
+        $.getJSON("/admgr/GetCompaniesAndDeptsByUserEntry", function (data) {
+            CompanyArray = data.CompanyViewModelList;
+            DeptArray = data.DeptViewModelList;
+                $.getJSON("/admgr/GetTitles", function (data) {
+                    TitleArray = data;
+                    var ManageUserViewModel = kendo.observable({
+                        isVisible: true,
+                        onSave: function (e) {
+                            //kendoConsole.log("event :: save(" + kendo.stringify(e.values, null, 4) + ")");
+                        },
+                        adUsers: new kendo.data.DataSource({
+                            error: function (e) {
+                                alert(e.errors);
+                            },
+                            schema: {
+                                errors: function (response) {
+                                    return response.error; // twitter's response is { "error": "Invalid query" }
+                                },
+                                model: {
+                                    id: "AdUserInfoId",
+                                    fields: {
+                                        AdUserInfoId: { type: "string", editable: false, validation: { required: false }, nullable: true },
+                                        Sn: { type: "string",  validation: { required: false }, nullable: true },
+                                        Number: { type: "string",  validation: { required: false }, nullable: true },
+                                        AdName: { type: "string", validation: { required: false }, nullable: true },
+                                        CompanyId: {  validation: { required: false }, nullable: true },
+                                        DeptId: {  validation: { required: false }, nullable: true },
+                                        TitleId: {   validation: { required: false }, nullable: true },
+                                        //DisplayName: { type: "string", editable: false,   validation: { required: false }, nullable: true },
+                                        Email: { type: "string",  validation: { required: false }, nullable: true },
+                                        Mobile: { type: "string",  validation: { required: false }, nullable: true },
+                                        DisbleId: { validation: { required: false }, nullable: true }
+                                    }
+                                }
+                            },
+                            batch: true,
+                            transport: {
+                                read: {
+                                    url: "/admgr/CompanyAdUserList",
+                                    dataType: "json"
+                                   
+                                },
+                                destroy: {
+                                    url: "/admgr/CompanyAdUserDelete",
+                                    dataType: "json",
+                                    type: "post"
+                                },
+                                update: {
+                                    url: "/admgr/CompanyAdUserEdit",
+                                    dataType: "json",
+                                    type: "post"
+                                },
+                                create: {
+                                    url: "/admgr/CompanyAdUserAdd",
+                                    dataType: "json",
+                                    type: "post"
+                                },
+                                parameterMap: function (options, operation) {
+                                    if (operation !== "read" && options.models) {
+                                        return { models: kendo.stringify(options.models) };
+                                    }
+                                }
+                            }
+                        })
+                    });
+                    kendo.bind($("#ManageCompanyAdUser"), ManageUserViewModel);
+                });
+            //});
+
+        });
+
+        function getCompanyName(CompanyId) {
+            for (var idx = 0, length = CompanyArray.length; idx < length; idx++) {
+                if (CompanyArray[idx].CompanyId === CompanyId) {
+                    return CompanyArray[idx].CompanyName;
+                }
+            }
+        };
+        function getDeptName(DeptId) {
+            for (var idx = 0, length = DeptArray.length; idx < length; idx++) {
+                if (DeptArray[idx].DeptId === DeptId) {
+                    return DeptArray[idx].DeptName;
+                }
+            }
+        };
+        function getTitleName(TitleId) {
+            for (var idx = 0, length = TitleArray.length; idx < length; idx++) {
+                if (TitleArray[idx].TitleId === TitleId) {
+                    return TitleArray[idx].TitleName;
+                }
+            }
+        };
+        function getDisableName(DisbleId) {
+            for (var idx = 0, length = DisableArray.length; idx < length; idx++) {
+                if (DisableArray[idx].DisbleId === DisbleId) {
+                    return DisableArray[idx].DisableName;
+                }
+            }
+        };
+        function companyDropDownEditor(container, options) {
+            //$('<input required data-text-field="CompanyName" data-value-field="CompanyId" data-bind="value:' + options.field + '" />')
+            var input = $('<input id="CompanyId" name="CompanyId">')   
+                .appendTo(container).width(300)
+                .kendoDropDownList({
+                    optionLabel: {
+                        CompanyName: "--请选择公司--",
+                        CompanyId: ""
+                    },
+                    filter: "contains",
+                    dataTextField: "CompanyName",
+                    dataValueField: "CompanyId",
+                    dataSource: CompanyArray
+                });
+        };
+        function deptDropDownEditor(container, options) {
+            //$('<input required data-text-field="DeptName" data-value-field="DeptId" data-bind="value:' + options.field + '" />')
+            var input = $('<input id="DeptId" name="DeptId">')   
+             .appendTo(container).width(300)
+                .kendoDropDownList({
+                    optionLabel: {
+                        DeptName: "--请选择部门--",
+                        DeptId: ""
+                    },
+                    cascadeFrom: "CompanyId",
+                    autoBind: true,
+                    filter: "contains",
+                    dataTextField: "DeptName",
+                    dataValueField: "DeptId",
+                    dataSource: DeptArray
+                });
+        };
+        function titleDropDownEditor(container, options) {
+            $('<input required data-text-field="TitleName" data-value-field="TitleId" data-bind="value:' + options.field + '" />')
+                .appendTo(container).width(300)
+                .kendoDropDownList({
+                    optionLabel: {
+                        TitleName: "--请选择职位--",
+                        TitleId: ""
+                    },
+                    autoBind: true,
+                    filter: "contains",
+                    dataTextField: "TitleName",
+                    dataValueField: "TitleId",
+                    dataSource: TitleArray
+                });
+        };
+        function disbleDropDownEditor(container, options) {
+            $('<input required data-text-field="DisableName" data-value-field="DisbleId" data-bind="value:' + options.field + '" />')
+                .appendTo(container)
+                .kendoDropDownList({
+                    optionLabel: {
+                        DisableName: "--请选择是否启用--",
+                        DisbleId: ""
+                    },
+                    autoBind: true,
+                    dataTextField: "DisableName",
+                    dataValueField: "DisbleId",
+                    dataSource: DisableArray
+                });
+        };
+    </script>
+
+

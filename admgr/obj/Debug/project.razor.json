@@ -1,0 +1,14 @@
+{
+  "ProjectFilePath": "d:\\待整理\\admgr2016.11.11\\admgr\\admgr.csproj",
+  "TargetFramework": "v4.5",
+  "TagHelpers": [],
+  "Configuration": {
+    "ConfigurationName": "UnsupportedRazor",
+    "LanguageVersion": "1.0",
+    "Extensions": [
+      {
+        "ExtensionName": "UnsupportedRazorExtension"
+      }
+    ]
+  }
+}

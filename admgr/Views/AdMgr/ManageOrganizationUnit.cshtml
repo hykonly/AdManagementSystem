@@ -1,0 +1,128 @@
+﻿
+@{
+    ViewBag.Title = "管理组织单位";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>管理组织单位</h2>
+
+<div id="example">
+    <div id="grid"></div>
+</div>
+    <script>
+                $(document).ready(function() {
+                    var element = $("#grid").kendoGrid({
+                        error: function (e) {
+                            alert(e.errors);
+                        },
+                        dataSource: {
+                            transport: {
+                                read: {
+                                    url: "/admgr/GetCompanies",
+                                    dataType: "json",
+                                },
+                                update: {
+                                    url: "/admgr/EditCompany",
+                                    dataType: "json",
+                                    type:"post"
+                                },
+                                create: {
+                                    url: "/admgr/AddCompany",
+                                    dataType: "json",
+                                    type:"post"
+
+                                },
+                                //parameterMap: function (options, operation) {
+                                //    if (operation !== "read" && options.models) {
+                                //        return { models: kendo.stringify(options.models) };
+                                //    }
+                                //}
+                            },
+                            schema: {
+                                errors: function (response) {
+                                    return response.error; // twitter's response is { "error": "Invalid query" }
+                                },
+                                model: {
+                                    id: "CompanyId",
+                                    fields: {
+                                        CompanyId: { editable: false, type: "string",nullable: true },
+                                        CompanyName: { editable: true, nullable: true, type: "string", validation: { required: false } }
+                                    }
+                                }
+                            }
+                            //pageSize: 6,
+                            //serverPaging: false,
+                            //serverSorting: true
+                        },
+                        toolbar: ["create"],
+                        height: 600,
+                        //sortable: true,
+                        //pageable: true,
+                        detailInit: detailInit,
+                        editable: "popup",
+                        //dataBound: function() {
+                        //    this.expandRow(this.tbody.find("tr.k-master-row").first());
+                        //},
+                        columns: [
+                            { field: "CompanyName",  title: "公司名称"},
+                        { command: ["edit"], title: "编辑" }
+                        ]
+                    });
+                });
+
+                function detailInit(e) {
+                    $("<div/>").appendTo(e.detailCell).kendoGrid({
+
+                        dataSource: {
+
+                            transport: {
+                                read: {
+                                    url: "/admgr/GetDepts",
+                                    dataType: "json",
+                                    type: "post"
+                                },
+                                update:  {
+                                    url: "/admgr/EditDept",
+                                    dataType: "json",
+                                    type: "post"
+                                },
+                                create: {
+                                    url: "/admgr/AddDept",
+                                    dataType: "json",
+                                    type: "post"
+                                }
+                                //create: function () {
+                                //    //var data = options;
+                                //    //test = data;
+                                //    console.log("right");
+                                //},
+                            },
+                            filter: { field: "CompanyId", operator: "eq", value: e.data.CompanyId },
+                            //serverPaging: true,
+                            //serverSorting: true,
+                            serverFiltering: true,
+                            //pageSize: 10,
+                            schema: {
+                                model: {
+                                    id: "DeptId",
+                                    fields: {
+                                        DeptId: { editable: false, type: "string", nullable: false },
+                                        CompanyId: { editable: false, type: "string", nullable: false,defaultValue: e.data.CompanyId },
+                                        DeptName: { editable: true, nullable: true, type: "string", validation: { required: false } }
+                                    }
+                                }
+                            }
+
+                        },
+                        toolbar: ["create"],
+                        editable: "popup",
+                        //scrollable: true,
+                        //sortable: true,
+                        //pageable: true,
+                        columns: [
+                            { field: "DeptName",  title:"部门名称"},
+                            { command: ["edit"], title: "编辑" }
+                        ]
+                    });
+                }
+    </script>

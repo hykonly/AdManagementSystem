@@ -1,0 +1,141 @@
+﻿
+@{
+    ViewBag.Title = "短信服务配置";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div id="smsSystem">
+
+    <div class="demo-section k-content col-lg-offset-6 col-md-offset-6" data-bind="invisible:admgrSystemPreview">
+        <h2>
+            短信服务配置
+        </h2>
+        <ul class="fieldlist">
+            <li>
+                <label for="simple-input">短信服务url地址</label>
+                <p>@ViewData["MsgUrl"]</p>
+            </li>
+            <li>
+                <label for="simple-input">短信服务账户</label>
+                <p>@ViewData["MsgAccount"]</p>
+            </li>
+            <li>
+                <button class="k-button k-primary k-space-right" data-bind="click:edit">编辑</button>
+            </li>
+        </ul>
+    </div>
+    <div class="demo-section k-content" data-bind="invisible:admgrSystemSubmit" id="smsSystem">
+        <ul class="fieldlist">
+            <li>
+                <label for="simple-input">短信服务url地址</label>
+                <input id="MsgUrl" name="MsgUrl" type="text" class="k-textbox" style="width: 100%;" value="@ViewData["MsgUrl"]" />
+            </li>
+            <li>
+                <label for="simple-input">短信服务账户</label>
+                <input id="MsgAccount" name="MsgAccount" type="text" class="k-textbox" style="width: 100%;" value="@ViewData["MsgAccount"]"/>
+            </li>
+            <li>
+                <label for="simple-input">短信服务密码</label>
+                <input id="MsgPwd" name="MsgPwd" type="password" class="k-textbox" style="width: 100%;"  />
+            </li>
+            <li>
+                <label for="simple-input">短信服务密码确认</label>
+                <input id="MsgPwdComfirmed" name="MsgPwdComfirmed" type="password" class="k-textbox" style="width: 100%;" />
+                <span class="k-invalid-msg" data-for="MsgPwdComfirmed"></span><br />
+             </li>
+            <li>
+                <button class="k-button k-primary k-space-right" data-bind="click:sub" id="submitForm">提交</button>
+            </li>
+        </ul>
+    </div>
+</div>
+<script type="text/javascript">
+    $("#smsSystem").kendoValidator({
+        rules: {
+            verifyPasswords: function (input) {
+                var ret = true;
+                if (input.is("[name=MsgPwdComfirmed]")) {
+                    ret = input.val() === $("#MsgPwd").val();
+                }
+                return ret;
+            }
+        },
+        messages: {
+            verifyPasswords: "两次输入的密码不一致"
+        }
+    });
+
+
+    var viewModelSmsSystem = kendo.observable({
+        admgrSystemPreview: false,
+        admgrSystemSubmit: true,
+        edit: function (e) {
+            e.preventDefault();
+            this.set("admgrSystemPreview", true);
+            this.set("admgrSystemSubmit", false);
+        },
+        sub: function (e) {
+            e.preventDefault();
+            $.ajax({
+                //提交数据的类型 GET GET
+                type: "POST",
+                //提交的网址
+                url: "/AdMgr/SmsSystemIndexEdit",
+                //提交的数据
+                data: { MsgUrl: $("#MsgUrl").val(), MsgAccount: $("#MsgAccount").val(), MsgPwd: $("#MsgPwd").val()},
+                //返回数据的格式
+                datatype: "json", //"xml", "html", "script", "json", "jsonp", "text".
+                //在请求之前调用的函数
+                //beforeSend: function() { $("#msg").html("logining"); },
+                //成功返回之后调用的函数
+                success: function (data) {
+                    var dt = JSON.parse(data);
+                    var result = dt.result;
+                    if (result) {
+                        location.href = "/admgr/SmsSystemIndex";
+                        return false;
+                    } else {
+                        alert("操作失败");
+                        return true;
+                    }
+                },
+                //调用执行后调用的函数
+                //complete: function(XMLHttpRequest, textStatus) {
+                //    alert(XMLHttpRequest.responseText);
+                //    alert(textStatus);
+                //HideLoading();
+                //},
+                //调用出错执行的函数
+                error: function () {
+                    //请求出错处理
+                    alert("后台错误");
+                    return false;
+                }
+            });
+        },
+    });
+    kendo.bind($("#smsSystem"), viewModelSmsSystem);
+
+</script>
+<style>
+    .fieldlist {
+        margin: 0 0 -2em;
+        padding: 0;
+    }
+
+        .fieldlist li {
+            list-style: none;
+            padding-bottom: 2em;
+        }
+
+        .fieldlist label {
+            display: block;
+            padding-bottom: 1em;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 12px;
+            color: #444;
+        }
+</style>
+
+

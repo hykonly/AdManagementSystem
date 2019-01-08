@@ -1,0 +1,172 @@
+﻿
+@{
+    ViewBag.Title = "ad用户权限配置";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>域用户权限配置</h2>
+
+<div id="AdUserAuthorityFirst">
+    <div class="demo-section k-content wide ">
+        <div>
+            <div data-role="grid"
+                 data-editable="popup"
+                 data-toolbar="['create', 'save']"
+                 data-columns="[
+                    @*{ 'field': 'Id', title:'序号','width': 110 },*@
+                    { 'field': 'AdUserId', title:'域用户名称',editor:adUserDropDownEditor,template:'#:getAdUserName(AdUserId)#','width': 110 },
+                    { 'field': 'RoleId',title:'角色' ,editor:roleDropDownEditor,template:'#:getRoleName(RoleId)#','width': 110},
+                    { 'command': ['edit','destroy'],title:'编辑' ,'width': 110}
+                         ]"
+                 data-bind="source: adUsers,
+                            visible: isVisible,
+                            @*events: {
+                              change: onSave
+                            }*@"
+                 style="height: 600px"></div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    var AdUserArray = [];
+    var RoleArray = [];
+        $.getJSON("/admgr/GetAllAdUsers", function (data) {
+            AdUserArray = data;
+    
+            $.getJSON("/admgr/GetRoles", function (data) {
+                RoleArray = data;
+                var AdUserAuthorityFirstViewModel = kendo.observable({
+                    isVisible: true,
+                    onSave: function (e) {
+                        //console.log("event :: save(" + kendo.stringify(e.values, null, 4) + ")");
+                    },
+                    adUsers: new kendo.data.DataSource({
+                        error: function (e) {
+                            alert(e.errors);
+                        },
+                        schema: {
+                            errors: function (response) {
+                                return response.error; // twitter's response is { "error": "Invalid query" }
+                            },
+                            model: {
+                                id: "Id",
+                                fields: {
+                                    Id: { editable: false, nullable: true },
+                                    AdUserId: {  defaultValue: 1 },
+                                    RoleId: {  defaultValue: 1 }
+                                }
+                            }
+                        },
+                        batch: true,
+                        transport: {
+                            read: {
+                                url: "/admgr/AdUserAuthorityList",
+                                dataType: "json"
+                            },
+                            destroy: {
+                                url: "/admgr/AdUserAuthorityDelete",
+                                dataType: "json"
+                            },
+                            update: {
+                                url: "/admgr/AdUserAuthorityEdit",
+                                dataType: "json"
+                            },
+                            create: {
+                                url: "/admgr/AdUserAuthorityAdd",
+                                dataType: "json"
+                            },
+                            parameterMap: function (options, operation) {
+                                var ts = options;
+                                var tt = options.models;
+                                if (operation !== "read" && options.models) {
+                                    return { models: kendo.stringify(options.models) };
+                                }
+                            }
+                        },
+                    })
+                });
+                kendo.bind($("#AdUserAuthorityFirst"), AdUserAuthorityFirstViewModel);
+            });
+        });
+
+        function adUserDropDownEditor(container, options) {
+            //$('<input required name="' + options.field + '"/>')
+            $('<input required data-text-field="AdUserName" data-value-field="AdUserId" data-bind="value:' + options.field + '" />')
+                .appendTo(container)
+                .kendoDropDownList({
+                    optionLabel: {
+                        AdUserName: "--请选择用户--",
+                        AdUserId: ""
+                    },
+                    autoBind: true,
+                    //valuePrimitive：当为true时输入框获取dataValueField对应的值，为false时获取dataTextField对应的值。
+                    //valuePrimitive: false,
+                    filter: "contains",
+                    dataTextField: "AdUserName",
+                    dataValueField: "AdUserId",
+                    dataSource: AdUserArray
+                    //dataSource: {
+                    //    transport: {
+                    //        read: {
+                    //            url: "/admgr/GetAllAdUsers",
+                    //            dataType: "json"
+                    //        }
+                    //    }
+                    //}
+                });
+        };
+        function roleDropDownEditor(container, options) {
+            //$('<input required name="' + options.field + '"/>')
+            $('<input required data-text-field="RoleName" data-value-field="RoleId" data-bind="value:' + options.field + '" />')
+                .appendTo(container)
+                .kendoDropDownList({
+                    optionLabel: {
+                        RoleName: "--请选择角色--",
+                        RoleId: ""
+                    },
+                    autoBind: true,
+                    dataTextField: "RoleName",
+                    dataValueField: "RoleId",
+                    dataSource: {
+                        transport: {
+                            read: {
+                                url: "/admgr/GetRoles",
+                                dataType: "json"
+                            }
+                        }
+                    },
+
+                });
+        };
+        function convertValues(value) {
+            var data = {};
+
+            value = $.isArray(value) ? value : [value];
+
+            for (var idx = 0; idx < value.length; idx++) {
+                data["values[" + idx + "]"] = value[idx];
+            }
+
+            return data;
+        }
+        function getAdUserName(AdUserId) {
+            for (var idx = 0, length = AdUserArray.length; idx < length; idx++) {
+                if (AdUserArray[idx].AdUserId === AdUserId) {
+                    return AdUserArray[idx].AdUserName;
+                }
+            }
+        }
+        function getRoleName(RoleId) {
+            for (var idx = 0, length = RoleArray.length; idx < length; idx++) {
+                if (RoleArray[idx].RoleId === RoleId) {
+                    return RoleArray[idx].RoleName;
+                }
+            }
+        }
+
+</script>
+
+
+

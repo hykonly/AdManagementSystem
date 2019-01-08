@@ -1,0 +1,116 @@
+﻿
+@{
+    ViewBag.Title = "Exchange分子公司邮箱配置";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div id="ExchangeCompanyMail">
+    <div class="demo-section k-content wide ">
+        <h2>Exchange分子公司邮箱配置</h2>
+        <div>
+            <div data-role="grid"
+                 data-editable="popup"
+                 data-toolbar="['create']"
+                 data-columns="[
+                    { 'field': 'CompanyId',title:'公司名称' ,editor:companyDropDownEditor,template:'#:getCompanyName(CompanyId)#','width':100},
+                    { 'field': 'MainMailAddress',title:'主邮箱名称' ,'width': 40},
+                    { 'field': 'SecondMailAddress',title:'辅邮箱名称' ,'width': 40},
+                    { 'field': 'EmailStoreDb',title:'邮件数据库' ,'width': 40},
+                    { 'command': ['edit','destroy'],title:'编辑' ,'width': 80}
+                         ]"
+                 data-bind="source: adUsers,
+                            visible: isVisible
+                           "
+                 style="height: 600px"></div>
+        </div>
+    </div>
+
+</div>
+
+
+<script>
+    var CompanyArray =[];
+    $.getJSON("/admgr/GetCompanies", function (data) {
+        CompanyArray = data;
+        var viewModelExchangeCompany = kendo.observable({
+            isVisible: true,
+            //onSave: function (e) {
+            //    //kendoConsole.log("event :: save(" + kendo.stringify(e.values, null, 4) + ")");
+            //},
+            adUsers: new kendo.data.DataSource({
+                schema: {
+                    model: {
+                        id: "EmailDataId",
+                        fields: {
+                            EmailDataId: { editable: false },
+                            CompanyId: { defaultValue: 1 },
+                            MainMailAddress: { type: "string", editable: true, validation: { required: false }, nullable: true },
+                            SecondMailAddress: { type: "string", editable: true, validation: { required: false }, nullable: true },
+                            EmailStoreDb: { type: "string", editable: true, validation: { required: false }, nullable: true }
+                        }
+                    }
+                },
+                //batch: true,
+                transport: {
+                    read: {
+                        url: "/admgr/ExchangeCompanyMailList",
+                        dataType: "json"
+                    },
+                    destroy: {
+                        url: "/admgr/ExchangeCompanyMailDelete",
+                        dataType: "json",
+                        type: "post"
+                    },
+                    update: {
+                        url: "/admgr/ExchangeCompanyMailUpdate",
+                        dataType: "json",
+                        type: "post"
+                    },
+                    create: {
+                        url: "/admgr/ExchangeCompanyMailAdd",
+                        dataType: "json",
+                        type: "post"
+                    }
+                    //parameterMap: function (options, operation) {
+                    //    if (operation !== "read" && options.models) {
+                    //        return { models: kendo.stringify(options.models) };
+                    //    }
+                    //}
+                }
+            })
+        });
+        kendo.bind($("#ExchangeCompanyMail"), viewModelExchangeCompany);
+    });
+
+
+
+    function companyDropDownEditor(container, options) {
+        //$('<input required data-text-field="CompanyName" data-value-field="CompanyId" data-bind="value:' + options.field + '" />')
+        var input = $('<input id="CompanyId" name="CompanyId">')
+            .appendTo(container)
+            .kendoDropDownList({
+                optionLabel: {
+                    CompanyName: "--请选择公司--",
+                    CompanyId: ""
+                },
+                autoBind: true,
+                filter: "contains",
+                dataTextField: "CompanyName",
+                dataValueField: "CompanyId",
+                dataSource: CompanyArray
+            });
+    };
+
+    function getCompanyName(CompanyId) {
+        for (var idx = 0, length = CompanyArray.length; idx < length; idx++) {
+            if (CompanyArray[idx].CompanyId === CompanyId) {
+                return CompanyArray[idx].CompanyName;
+            }
+        }
+    };
+
+</script>
+
+
+
+

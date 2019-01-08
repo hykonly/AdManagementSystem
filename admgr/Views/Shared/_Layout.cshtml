@@ -1,0 +1,347 @@
+﻿<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - admgr管理系统</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    <link href="~/Scripts/kendo/styles/kendo.common.min.css" rel="stylesheet" />
+    <link href="~/Scripts/kendo/styles/kendo.dataviz.default.min.css" rel="stylesheet" />
+    <link href="~/Scripts/kendo/styles/kendo.default.min.css" rel="stylesheet" />
+    <script src="~/Scripts/kendo/js/jszip.min.js"></script>
+    <script src="~/Scripts/kendo/js/kendo.all.min.js"></script>
+    <script src="~/Scripts/kendo/js/kendo.culture.zh.min.js"></script>
+    <script src="~/Scripts/kendo/js/kendo.messages.zh-CN.min.js"></script>
+    <script src="~/Scripts/jquery.cookie.js"></script>
+</head>
+<body>
+    @RenderSection("scripts", required: false)
+    <div id="wapper">
+        <div class="col-lg-4 col-md-4 col-sm-4"></div>
+        <div id="index-menu" class="col-lg-4 col-md-4 col-sm-4">
+            <div id="megaStore">
+                <ul data-role="menu"
+                    style="width: 100%;" id="menu">
+                    <li>
+                        AD
+                        <ul>
+                            <li id="AdUserIndex" data-bind="events: { click: onAdUserIndexSelect },visible: isAdUserIndexVisible">
+                                个人域信息
+                            </li>
+                            <li id="CompanyAdUserManage" data-bind="events: { click: onCompanyAdUserManageSelect },visible: isCompanyAdUserManageVisible">
+                                公司域帐号管理
+                            </li>
+                            <li id="AdUserManage" data-bind="events: { click: onAdUserManageSelect },visible: isAdUserManageVisible">
+                                集团域帐号管理
+                            </li>
+                            <li id="AdOuManage" data-bind="events: { click: onAdOuManageSelect },visible: isAdOuManageVisible">
+                                域组织机构管理
+                            </li>
+                            <li id="AdSystemConfig" data-bind="events: { click: onAdSystemConfigSelect },visible: isAdSystemConfigVisible">
+                                域控配置
+                            </li>
+                            <li id="AdUserAuthorityConfig" data-bind="events: { click: onAdUserAuthorityConfigSelect },visible: isAdUserAuthorityConfigVisible">
+                                用户权限配置
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        Exchange
+                        <ul>
+                            <li id="ExchangeSystemConfig" data-bind="events: { click: onExchangeSystemConfigSelect },visible: isExchangeSystemConfigVisible">
+                                Exchange配置
+                            </li>
+                            <li id="ExchangeCompanyMailConfig" data-bind="events: { click: onExchangeCompanyMailConfigSelect },visible: isExchangeCompanyMailConfigVisible">
+                                分子公司邮箱配置
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        Lync
+                        <ul>
+                            <li id="LyncSystemConfig" data-bind="events: { click: onLyncSystemConfigSelect },visible: isLyncSystemConfigVisible">
+                                Lync配置
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        其他系统
+                        <ul>
+                            <li id="SmsSystemConfig" data-bind="events: { click: onSmsSystemConfigSelect },visible: isSmsSystemConfigVisible">
+                                短信服务配置
+                            </li>
+                            <li id="AdmgrSystemConfig" data-bind="events: { click: onAdmgrSystemConfigSelect },visible: isAdmgrSystemConfigVisible">
+                                admgr系统配置
+                            </li>
+                        </ul>
+                    </li>
+                   
+                    <li data-bind="events: { click: selectlogOut },visible: isLogOut" style="float:right;background-color:darkgray;">注销</li>
+                    <li data-bind="visible:haveUserName" style="float:right;background-color:darkgray;"><span id="UserName"></span></li>
+                </ul>
+            </div>
+            
+        </div>
+        <div class="col-lg-4 col-md-4 col-sm-4"></div>
+        <div style="clear:both"></div>
+        <div id="content">
+            @RenderBody()
+        </div>
+        @*<div id="footer" class="col-lg-offset-5 col-md-offset-5 col-sm-offset-5 modal-footer ">
+            <footer class="text-center">
+                <p>&copy; @DateTime.Now.Year - admgr管理系统</p>
+            </footer>
+        </div>*@
+    </div>
+
+    <script>
+        var username;
+        var roleNum;
+        var userCookie;
+        if ($.cookie("user") != null) {
+            userCookie = JSON.parse($.cookie("user"));
+            username = userCookie.name;
+            roleNum = userCookie.roleNum;
+        } else {
+            roleNum = 0;
+        };
+        var viewModel = kendo.observable({
+            haveUserName: function () {
+                if (username != null) {
+                    $("#UserName").text(username);
+                    return true;
+                } else {
+                    return false;
+                }
+            },
+            isLogOut: function () {
+                if (username != null) {
+                    return true;
+                } else {
+                    return false;
+                }
+            },
+            selectlogOut: function (e) {
+                location.href = "/AdMgr/logout"
+                return true;
+            },
+
+        //个人域信息，roleNum为1,2
+        isAdUserIndexVisible: function () {
+            if (roleNum == 1 || roleNum == 2 || roleNum == 6) {
+                return true;
+            }
+                return false;
+        },
+        onAdUserIndexSelect: function (e) {
+            if (roleNum == 1 || roleNum == 2 || roleNum == 6) {
+                location.href = "/AdMgr/UserIndex"
+                return true;
+            }
+            return false;
+            //var text = $(e.item).children(".k-link").text();
+            //kendoConsole.log("event :: select(" + text + ")");
+        },
+        //公司域信息，roleNum为2
+        isCompanyAdUserManageVisible: function () {
+            if ( roleNum == 2) {
+                return true;
+            }
+            return false;
+        },
+        onCompanyAdUserManageSelect: function (e) {
+            if ( roleNum == 2) {
+                location.href = "/AdMgr/ManageCompanyAdUser"
+                return true;
+            }
+            return false;
+            //var text = $(e.item).children(".k-link").text();
+            //kendoConsole.log("event :: select(" + text + ")");
+        },
+        //集团域帐号管理，roleNum为6
+        isAdUserManageVisible: function () {
+            if (roleNum == 6) {
+                return true;
+            }
+            return false;
+        },
+        onAdUserManageSelect: function (e) {
+            if (roleNum == 6) {
+                location.href = "/AdMgr/ManageAdUser"
+            }
+            return false;
+        },
+        //域组织机构管理，roleNum为5
+        isAdOuManageVisible: function () {
+            if (roleNum == 5) {
+                return true;
+            }
+            return false;
+        },
+        onAdOuManageSelect: function (e) {
+            if (roleNum == 5) {
+                location.href = "/AdMgr/ManageOrganizationUnit"
+            }
+            return false;
+        },
+        //域控配置，roleNum为5
+        isAdSystemConfigVisible: function () {
+            if (roleNum == 5) {
+                return true;
+            }
+            return false;
+        },
+        onAdSystemConfigSelect: function (e) {
+            if (roleNum == 5) {
+                location.href = "/AdMgr/AdSystemIndex"
+            }
+            return false;
+        },
+        //用户权限配置，roleNum为5
+        isAdUserAuthorityConfigVisible: function () {
+            if (roleNum == 5) {
+                return true;
+            }
+            return false;
+        },
+        onAdUserAuthorityConfigSelect: function (e) {
+            if (roleNum == 5) {
+                location.href = "/AdMgr/AdUserAuthority"
+            }
+            return false;
+        },
+        //Exchange配置，roleNum为3
+        isExchangeSystemConfigVisible: function () {
+            if (roleNum == 3) {
+                return true;
+            }
+            return false;
+        },
+        onExchangeSystemConfigSelect: function (e) {
+            if (roleNum == 3) {
+                location.href = "/AdMgr/ExchangeSystemIndex"
+            }
+            return false;
+        },
+        //分子公司邮箱配置，roleNum为3
+        isExchangeCompanyMailConfigVisible: function () {
+            if (roleNum == 3) {
+                return true;
+            }
+            return false;
+        },
+        onExchangeCompanyMailConfigSelect: function (e) {
+            if (roleNum == 3) {
+                location.href = "/AdMgr/ExchangeCompanyMail"
+            }
+            return false;
+        },
+        //Lync配置，roleNum为4
+        isLyncSystemConfigVisible: function () {
+            if (roleNum == 4) {
+                return true;
+            }
+            return false;
+        },
+        onLyncSystemConfigSelect: function (e) {
+            if (roleNum == 4) {
+                location.href = "/AdMgr/LyncSystemConfig"
+            }
+            return false;
+        },
+        //短信服务配置，roleNum为5
+        isSmsSystemConfigVisible: function () {
+            if (roleNum == 5) {
+                return true;
+            }
+            return false;
+        },
+        onSmsSystemConfigSelect: function (e) {
+            if (roleNum == 5) {
+                location.href = "/AdMgr/SmsSystemIndex"
+            }
+            return false;
+        },
+        //admgr系统配置，roleNum为5
+        isAdmgrSystemConfigVisible: function () {
+            if (roleNum == 5) {
+                return true;
+            }
+            return false;
+        },
+        onAdmgrSystemConfigSelect: function (e) {
+            if (roleNum == 5) {
+                location.href = "/AdMgr/AdmgrSystemIndex"
+            }
+            return false;
+        }
+    });
+    kendo.bind($("#index-menu"), viewModel);
+    </script>
+
+    <style>
+        #megaStore {
+            max-width: 600px;
+            margin: 30px auto;
+            padding-top: 120px;
+            background: url('../content/photo/header.jpg') no-repeat center 0;
+        }
+
+        #menu h2 {
+            font-size: 1em;
+            text-transform: uppercase;
+            padding: 5px 10px;
+        }
+        #wapper{     
+            position: relative;   /*重要！保证footer是相对于wapper位置绝对*/     
+            height: auto;          /* 保证页面能撑开浏览器高度时显示正常*/     
+            min-height: 100%  /* IE6不支持，IE6要单独配置*/     
+        }     
+        #footer{     
+           position: absolute; bottom: 0; /* 关键 */     
+           left:0; /* IE下一定要记得 */     
+           height: 60px;         /* footer的高度一定要是固定值*/     
+        }     
+        #content{     
+            padding-top:3%;
+            padding-bottom: 3%; /*重要！给footer预留的空间*/     
+        } 
+        div.k-widget k-edit-form-container
+        {
+            width: auto !important;
+            min-width: 800px !important;
+            max-width: 1800px !important;
+        }
+ 
+        .k-popup-edit-form .k-edit-field > .k-textbox,
+        .k-popup-edit-form .k-edit-field > .k-widget
+        {
+            width: 100% !important;
+        }
+        .k-edit-label{
+                width: 20% !important;
+        }
+        .k-edit-field{
+             width: 70% !important;
+        }
+        span.k-widget.k-tooltip-validation {
+            display: inline-block;
+            width: 160px;
+            text-align: left;
+            border: 0;
+            padding: 0;
+            margin: 0;
+            background: none;
+            box-shadow: none;
+            color: red;
+        }
+
+        .k-tooltip-validation .k-warning {
+            display: none;
+        }
+    </style>
+</body>
+</html>

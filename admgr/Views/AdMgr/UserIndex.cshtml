@@ -1,0 +1,126 @@
+﻿
+@{
+    ViewBag.Title = "用户详情";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="col-lg-4 col-md-4 col-sm-4"></div>
+<div id="adUserDetails" class="col-lg-4 col-md-4 col-sm-4">
+    <h2 class="k-content text-center">用户详情</h2>
+    <!--ad域用户信息展示-->
+    <div  data-bind="invisible:adUserDetailsVisible" class="form-horizontal" >
+            <div id="fieldlist" >
+                <div class="form-group"><label class="control-label col-md-3">用户头像</label><div class="col-md-9 "><img id="adUserPhoto" class="glyphicon-ok-circle" src="@ViewData["userImage"]" /></div></div>
+                <div class="form-group"><label class="control-label col-md-3">工号</label> <div class="col-md-9"><p>@ViewData["number"]</p></div></div>
+                    <div class="form-group"><label class="control-label col-md-3">域用户名</label><div class="col-md-9"><p>@ViewData["adName"]</p></div></div> 
+                <div class="form-group"><label class="control-label col-md-3">姓名</label> <div class="col-md-9"><p>@ViewData["sn"]</p></div></div>
+                <div class="form-group"> <label class="control-label col-md-3">显示名</label> <div class="col-md-9"><p>@ViewData["displayName"]</p></div></div>
+                <div class="form-group"> <label class="control-label col-md-3">职务</label><div class="col-md-9"><p>@ViewData["title"]</p></div></div>
+                <div class="form-group"> <label class="control-label col-md-3">公司</label><div class="col-md-9"><p>@ViewData["company"]</p></div></div>
+                <div class="form-group"> <label class="control-label col-md-3">部门</label><div class="col-md-9"><p>@ViewData["dept"]</p></div></div>
+                <div class="form-group"> <label class="control-label col-md-3">办公室</label><div class="col-md-9"><p>@ViewData["office"]</p></div></div>
+                <div class="form-group"> <label class="control-label col-md-3">总机</label><div class="col-md-9"><p>@ViewData["officephone"]</p></div></div>
+                <div class="form-group"> <label class="control-label col-md-3">分机</label><div class="col-md-9"><p>@ViewData["ext"]</p></div></div>
+                <div class="form-group"> <label class="control-label col-md-3">传真</label><div class="col-md-9"><p>@ViewData["fax"]</p></div></div>
+                <div class="form-group"> <label class="control-label col-md-3">传真</label><div class="col-md-9"><p>@ViewData["email"]</p></div></div>
+                <div class="form-group"> <label class="control-label col-md-3">移动电话</label><div class="col-md-9"><p>@ViewData["mobile"]</p></div></div>
+                <div class="form-group"> <label class="control-label col-md-3">直线电话</label><div class="col-md-9"><p>@ViewData["homephone"]</p></div></div>
+                <div class="form-group"> <label class="control-label col-md-3">国家</label><div class="col-md-9"><p>@ViewData["country"]</p></div></div>
+                <div class="form-group"> <label class="control-label col-md-3">省/自治区</label><div class="col-md-9"><p>@ViewData["province"]</p></div></div>
+                <div class="form-group"> <label class="control-label col-md-3">市/县</label><div class="col-md-9"><p>@ViewData["city"]</p></div></div>
+                <div class="form-group"> <label class="control-label col-md-3">邮政编码</label><div class="col-md-9"><p>@ViewData["zipcode"]</p></div></div>
+                <div class="form-group"> <label class="control-label col-md-3">地址</label><div class="col-md-9"><p>@ViewData["address"]</p></div></div>
+                <div class="form-group"> <label class="control-label col-md-3">描述</label><div class="col-md-9"><p>@ViewData["description"]</p></div></div>
+            </div>
+        <div class="col-lg-offset-6 col-md-offset-6 col-sm-offset-6">
+            <button data-bind="click: edit" class="k-button k-primary ">编辑</button>
+        </div>
+          
+    </div>
+    <!--ad域用户信息编辑-->
+    <div  data-bind="invisible:adUserEditVisible" class="form-horizontal" >
+            <div id="fieldlist">
+                <div class="form-group"> <label class="control-label col-md-3">工号</label><div class="col-md-9"> <p>@ViewData["number"]</p></div></div><!--工号不可编辑-->
+                <div class="form-group"> <label class="control-label col-md-3">域用户名</label><div class="col-md-9">  <p>@ViewData["adName"]</p></div></div><!--域账户名不可编辑-->
+                <div class="form-group"> <label class="control-label col-md-3">姓名</label><div class="col-md-9">  <p>@ViewData["sn"]</p></div><!--姓名不可编辑-->
+                <div class="form-group">  <label class="control-label col-md-3">显示名</label> <div class="col-md-9"> <p>@ViewData["displayName"]</p></div></div><!--显示名不可编辑-->
+                <div class="form-group">  <label class="control-label col-md-3">职务</label><div class="col-md-9"> <p>@ViewData["title"]</p></div></div><!--职务不可编辑-->
+                <div class="form-group">  <label class="control-label col-md-3">公司</label><div class="col-md-9"> <p>@ViewData["company"]</p></div></div><!--公司名称不可编辑-->
+                <div class="form-group">  <label class="control-label col-md-3">部门</label><div class="col-md-9"> <p>@ViewData["dept"]</p></div></div><!--部门名称不可编辑-->
+                 <div class="form-group">  <label class="control-label col-md-3">办公室</label><div class="col-md-9"> <input id="office" value="@ViewData["office"]" class="k-textbox" required /></div></div>
+                <div class="form-group">  <label class="control-label col-md-3">办公室总机</label><input id="officephone" value="@ViewData["officephone"]" class="k-textbox" pattern="^[0-9]+" required validationMessage="请输入数字"/></div></div>
+                <div class="form-group">  <label class="control-label col-md-3">分机</label><div class="col-md-9"> <input id="ext" value="@ViewData["ext"]" class="k-textbox" pattern="^[0-9]+" required validationMessage="请输入数字"/></div></div>
+                <div class="form-group">  <label class="control-label col-md-3">传真</label><div class="col-md-9"> <input id="fax" value="@ViewData["fax"]" class="k-textbox" pattern="^[0-9]+" required validationMessage="请输入数字"/></div></div>
+                <div class="form-group">  <label class="control-label col-md-3">邮箱</label><div class="col-md-9"> <input id="email" value="@ViewData["email"]" class="k-textbox" pattern="^[A-Za-zd]+([-_.][A-Za-zd]+)*\\u0440([A-Za-zd]+[-.])+[A-Za-zd]{2,5}$" required validationMessage="请输入邮箱"/></div></div>
+                <div class="form-group">  <label class="control-label col-md-3">移动电话</label><div class="col-md-9"> <input id="mobile" value="@ViewData["mobile"]" class="k-textbox" pattern="^[0-9]+" required validationMessage="请输入数字"/></div></div>
+                <div class="form-group">  <label class="control-label col-md-3">直线电话</label><div class="col-md-9"> <input id="homephone" value="@ViewData["homephone"]" class="k-textbox" pattern="^[0-9]+" required validationMessage="请输入数字"/></div></div>
+                <div class="form-group">  <label class="control-label col-md-3">国家</label><div class="col-md-9"> <input id="country" value="@ViewData["country"]" class="k-textbox" /></div></div>
+                <div class="form-group">  <label class="control-label col-md-3">省/自治区</label><div class="col-md-9"> <input id="province" value="@ViewData["province"]" class="k-textbox" /></div></div>
+                <div class="form-group">  <label class="control-label col-md-3">市/县</label><div class="col-md-9"> <input id="city" value="@ViewData["city"]" class="k-textbox" /></div></div>
+                <div class="form-group">  <label class="control-label col-md-3">邮政编码</label><div class="col-md-9"> <input id="zipcode" value="@ViewData["zipcode"]" class="k-textbox" pattern="^[0-9]+" required validationMessage="请输入数字"/></div></div>
+                <div class="form-group">  <label class="control-label col-md-3">地址</label><div class="col-md-9"> <input id="address" value="@ViewData["address"]" class="k-textbox" /></div></div>
+                <div class="form-group">  <label class="control-label col-md-3">描述</label><div class="col-md-9"> <input id="description" value="@ViewData["description"]" class="k-textbox" /></div></div>
+            </div>
+        <div class="col-lg-offset-6 col-md-offset-6 col-sm-offset-6">
+            <button data-bind="click: sub" class="k-button k-primary">提交</button>
+         </div>
+    </div>
+</div>
+<div class="col-lg-4 col-md-4 col-sm-4"></div>
+
+<script type="text/javascript">
+    var validator = $("#adUserDetails").kendoValidator().data("kendoValidator");
+
+
+    var adUserViewModel = kendo.observable({
+        adUserDetailsVisible:false,
+        adUserEditVisible: true,
+        edit: function (e) {
+            this.set("adUserDetailsVisible", true);
+            this.set("adUserEditVisible", false);
+        },
+        sub: function (e) {
+            if (validator.validate()) {
+                e.preventDefault();
+                $.ajax({
+                    //提交数据的类型 GET GET
+                    type: "POST",
+                    //提交的网址
+                    url: "/AdMgr/UserIndexEdit",
+                    //提交的数据
+                    data: { office: $("#office").val(), officephone: $("#officephone").val(), ext: $("#ext").val(), fax: $("#fax").val(), mobile: $("#mobile").val(), homephone: $("#homephone").val(), country: $("#country").val(), province: $("#province").val(), city: $("#city").val(), zipcode: $("#zipcode").val(), address: $("#address").val(), description: $("#description").val() },
+                    //返回数据的格式
+                    datatype: "json", //"xml", "html", "script", "json", "jsonp", "text".
+                    //在请求之前调用的函数
+                    //beforeSend: function() { $("#msg").html("logining"); },
+                    //成功返回之后调用的函数
+                    success: function (data) {
+                        var dt = JSON.parse(data);
+                        var result = dt.result;
+                        if (result) {
+                            location.href = "/admgr/UserIndex";
+                            return false;
+                        } else {
+                            alert("修改失败");
+                            return true;
+                        }
+
+                    },
+                    //调用执行后调用的函数
+                    //complete: function(XMLHttpRequest, textStatus) {
+                    //    alert(XMLHttpRequest.responseText);
+                    //    alert(textStatus);
+                    //HideLoading();
+                    //},
+                    //调用出错执行的函数
+                    error: function () {
+                        //请求出错处理
+                        alert("后台错误");
+                        return false;
+                    }
+                });
+            }
+        },
+    });
+    kendo.bind($("#adUserDetails"), adUserViewModel);
+</script>
